@@ -39,6 +39,7 @@ python-dotenv = "^1.0.1"
 fastapi = "^0.115.6"
 uvicorn = "^0.34.0"
 pydantic = "^2.10.5"
+websockets = "^14.1"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
