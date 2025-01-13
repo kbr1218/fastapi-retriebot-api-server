@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "lgdx-server"
+version = "0.1.0"
+description = ""
+authors = ["kbr_1218 <kbr_uni@naver.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+
+# 데이터 처리 및 분석 관련 패키지
+pandas = "^2.2.3"
+
+# 시각화 및 사용자 인터페이스 관련 패키지
+matplotlib = "^3.10.0"
+seaborn = "^0.13.2"
+jupyter = "^1.1.1"
+ipywidgets = "^8.1.5"
+notebook = "^7.1.2"
+
+# FastAPI 서버 관련 패키지
+fastapi = "^0.115.6"
+uvicorn = "^0.34.0"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
