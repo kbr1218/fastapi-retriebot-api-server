@@ -18,11 +18,19 @@ jupyter = "^1.1.1"
 ipywidgets = "^8.1.5"
 notebook = "^7.1.2"
 
+# 딥러닝 및 머신러닝 관련 패키지
+torch = "^2.2.2"
+torchvision = "^0.17.2"
+
 # 언어 및 자연어 처리 관련 패키지
 google-generativeai = "^0.8.3"
 langchain-google-genai = "^2.0"
 langchain-teddynote = "^0.3.9"
-
+langchain = "^0.3"
+langchain-core = "^0.3"
+langchain-experimental = "^0.3"
+langchain-community = "^0.3"
+langsmith = "^0.1"
 
 # 기타 유틸리티 및 필수 패키지
 python-dotenv = "^1.0.1"
@@ -30,6 +38,7 @@ python-dotenv = "^1.0.1"
 # FastAPI 서버 관련 패키지
 fastapi = "^0.115.6"
 uvicorn = "^0.34.0"
+pydantic = "^2.10.5"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
