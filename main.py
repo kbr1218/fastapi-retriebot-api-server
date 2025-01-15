@@ -1,6 +1,5 @@
 # main.py
 from fastapi import FastAPI, WebSocket
-from pydantic import BaseModel
 import requests
 from api.router import classification_chain
 from api.default import default_chain
@@ -9,10 +8,6 @@ from api.default import default_chain
 app = FastAPI()
 
 MODEL_SERVER_URL = "http://127.0.0.1:8000/api/"
-
-# 사용자 입력값 데이터 모델 정의
-class UserInput(BaseModel):
-  input_text: str
 
 @app.get('/')
 def load_root():
