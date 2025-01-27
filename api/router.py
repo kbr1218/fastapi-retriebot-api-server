@@ -17,9 +17,8 @@ output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
 # 출력 지시사항 파싱
 format_instructions = output_parser.get_format_instructions()
 
-
 # template 불러오기
-classification_template = load_template_from_yaml("../prompts/router_template.yaml")
+classification_template = load_template_from_yaml("./prompts/router_template.yaml")
 classification_prompt = ChatPromptTemplate.from_template(classification_template,
                                                          partial_variables={'format_instructions': format_instructions})
 
