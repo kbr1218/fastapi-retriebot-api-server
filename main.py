@@ -1,5 +1,5 @@
 # main.py
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import requests
 from api.router import classification_chain
 from api.default import default_chain
@@ -12,21 +12,24 @@ MODEL_SERVER_URL = "http://127.0.0.1:8000/"
 def load_root():
   return {'hallo': "api server is running(port: 8001)💭"}
 
-@app.websocket('/{user_id}/classify')
+@app.websocket('/{user_id}/chat')
 async def classify_user_input(websocket: WebSocket, user_id: str):
   await websocket.accept()
   try:
     # 모델 서버로 user_id 전송
+    print(">>>>>>>", user_id)
     model_server_endpoint = f"{MODEL_SERVER_URL}{user_id}/api/connect"
     try:
-      response = requests.post(model_server_endpoint, json={"user_id": user_id})
+      response = requests.post(model_server_endpoint)
       if response.status_code == 200:
-        await websocket.send_json({"message": "model server 연결✔️"})
+        await websocket.send_json({"message": "✔️model server 연결 성공"})
       else:
         await websocket.send_json({"error": f"model server return status {response.status_code}"})
+        await websocket.close()
         return
     except requests.exceptions.RequestException as e:
-      await websocket.send_json({"error": f"model server 연결 실패✖️: {str(e)}"})
+      await websocket.send_json({"error": f"✖️model server 연결 실패: {str(e)}"})
+      await websocket.close()
       return
     
     # 채팅
