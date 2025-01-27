@@ -1,24 +1,36 @@
 # main.py
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 import requests
 from api.router import classification_chain
 from api.default import default_chain
-# from websocket_test import html
 
 app = FastAPI()
 
-MODEL_SERVER_URL = "http://127.0.0.1:8000/api/"
+MODEL_SERVER_URL = "http://127.0.0.1:8000/"
 
 @app.get('/')
 def load_root():
   return {'hallo': "api server is running(port: 8001)💭"}
-  # return HTMLResponse(html)
 
-@app.websocket('/ws/{user_id}/classify')
+@app.websocket('/{user_id}/classify')
 async def classify_user_input(websocket: WebSocket, user_id: str):
   await websocket.accept()
-  while True:
+  try:
+    # 모델 서버로 user_id 전송
+    model_server_endpoint = f"{MODEL_SERVER_URL}{user_id}/api/connect"
     try:
+      response = requests.post(model_server_endpoint, json={"user_id": user_id})
+      if response.status_code == 200:
+        await websocket.send_json({"message": "model server 연결✔️"})
+      else:
+        await websocket.send_json({"error": f"model server return status {response.status_code}"})
+        return
+    except requests.exceptions.RequestException as e:
+      await websocket.send_json({"error": f"model server 연결 실패✖️: {str(e)}"})
+      return
+    
+    # 채팅
+    while True:
       data = await websocket.receive_json()
       user_input = data.get("user_input", "")
 
@@ -39,10 +51,15 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
         response = default_chain.invoke({"classification_result": "default", "user_input": user_input})
       # 사용자의 입력 유형이 "정보검색" 또는 "추천요청"일 경우 모델서버 호출
       else:
-        model_server_endpoint = f"{MODEL_SERVER_URL}{user_id}/{model_endpoint}"
-        response = requests.post(model_server_endpoint, json={"user_input": user_input}).json()
+        model_server_endpoint = f"{MODEL_SERVER_URL}{user_id}/api/{model_endpoint}"
+        try:
+          response = requests.post(model_server_endpoint, json={"user_input": user_input}).json()
+        except requests.exceptions.RequestException as e:
+          await websocket.send_json({"error": f"model server API 요청 실패: {str(e)}"})
+          continue
 
-      # 클라이언트에게 전송하는 값
+      # 클라이언트에게 값 전송
       await websocket.send_json({"response": response})
-    except Exception as e:
-      await websocket.send_json({"error": f">>>>>> Websocket error: {str(e)}"})
+
+  except WebSocketDisconnect:
+    print(f"WebSocket disconnected for user_id: {user_id}")
