@@ -92,7 +92,7 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
             continue
 
         # 클라이언트에게 값 전송
-        await websocket.send_json({"response": response})
+        await websocket.send_json(response)
 
   except WebSocketDisconnect:
     print(f"WebSocket disconnected for user_id: {user_id}")
