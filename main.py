@@ -81,6 +81,8 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
 
         # 사용자 입력 유형이 "일반대화"일 경우 default_chain 실행
         if model_endpoint == "default":
+          print(f"------------- Default Chain 실행 -------------")
+
           response = default_chain.invoke({"classification_result": "default", "user_input": user_input})
         # 사용자의 입력 유형이 "정보검색" 또는 "추천요청"일 경우 모델서버 호출
         else:
