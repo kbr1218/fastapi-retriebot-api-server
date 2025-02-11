@@ -3,6 +3,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import requests
 from api.router import classification_chain
 from api.default import default_chain
+import json
 
 app = FastAPI()
 
@@ -23,7 +24,7 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
       response = requests.post(model_server_endpoint)
       # 사용자 확인 시 code 200 반환
       if response.status_code == 200:
-        await websocket.send_json({"message": "✔️model server 연결 성공"})
+        await websocket.send_json({"success": "✔️model server 연결 성공"})
       # 사용자를 찾을 수 없다면 웹소켓 close
       else:
         await websocket.send_json({"error": f"model server return status {response.status_code}"})
@@ -55,7 +56,7 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
         try:
           response = requests.post(watch_endpoint, json={"asset_id": asset_id, "runtime": runtime})
           if response.status_code == 200:
-            await websocket.send_json({"message": "✔️시청기록 저장 완료"})
+            await websocket.send_json({"success": "✔️시청기록 저장 완료"})
           else:
             await websocket.send_json({"error": f"시청기록 저장 실패. status code: {response.status_code}"})
         except requests.exceptions.RequestException as e:
@@ -83,8 +84,19 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
         if model_endpoint == "default":
           print(f"------------- Default Chain 실행 -------------")
 
-          response = default_chain.invoke({"classification_result": "default", "user_input": user_input})
+          response_data = default_chain.invoke({"classification_result": "default", "user_input": user_input})
         # 사용자의 입력 유형이 "정보검색" 또는 "추천요청"일 경우 모델서버 호출
+          print(f"testhere-----------------------------{response_data}")
+          if isinstance(response_data, str):
+            try:
+              response = json.loads(response_data)
+            except json.JSONDecodeError:
+              response = {"error": "챗봇 응답 처리 불가능"}
+          elif isinstance(response_data, dict):
+            response = response_data
+          else:
+            response = {"error": "알 수 없는 응답"}
+
         else:
           model_server_endpoint = f"{MODEL_SERVER_URL}{user_id}/api/{model_endpoint}"
           try:
