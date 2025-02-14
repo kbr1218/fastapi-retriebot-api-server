@@ -7,7 +7,7 @@ import json
 
 app = FastAPI()
 
-MODEL_SERVER_URL = "http://127.0.0.1:8000/"
+MODEL_SERVER_URL = "http://192.168.0.130:8000/"
 
 @app.get('/')
 def load_root():
@@ -24,7 +24,8 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
       response = requests.post(model_server_endpoint)
       # 사용자 확인 시 code 200 반환
       if response.status_code == 200:
-        await websocket.send_json({"success": "✔️model server 연결 성공"})
+        # await websocket.send_json({"success": "✔️model server 연결 성공"})
+        await websocket.send_json(response.json())
       # 사용자를 찾을 수 없다면 웹소켓 close
       else:
         await websocket.send_json({"error": f"model server return status {response.status_code}"})
@@ -54,9 +55,9 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
         # model server에 asset_id 전송
         watch_endpoint = f"{MODEL_SERVER_URL}{user_id}/api/watch"
         try:
-          response = requests.post(watch_endpoint, json={"asset_id": asset_id, "runtime": runtime})
+          response = requests.post(watch_endpoint, json={"asset_id": asset_id})
           if response.status_code == 200:
-            await websocket.send_json({"success": "✔️시청기록 저장 완료"})
+            await websocket.send_json(response.json())
           else:
             await websocket.send_json({"error": f"시청기록 저장 실패. status code: {response.status_code}"})
         except requests.exceptions.RequestException as e:
