@@ -7,7 +7,7 @@ import json
 
 app = FastAPI()
 
-MODEL_SERVER_URL = "http://192.168.0.130:8000/"
+MODEL_SERVER_URL = "http://localhost:8000/"
 
 @app.get('/')
 def load_root():
@@ -87,7 +87,6 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
 
           response_data = default_chain.invoke({"classification_result": "default", "user_input": user_input})
         # 사용자의 입력 유형이 "정보검색" 또는 "추천요청"일 경우 모델서버 호출
-          print(f"testhere-----------------------------{response_data}")
           if isinstance(response_data, str):
             try:
               response = json.loads(response_data)
