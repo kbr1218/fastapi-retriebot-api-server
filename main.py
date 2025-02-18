@@ -24,7 +24,6 @@ async def classify_user_input(websocket: WebSocket, user_id: str):
       response = requests.post(model_server_endpoint)
       # 사용자 확인 시 code 200 반환
       if response.status_code == 200:
-        # await websocket.send_json({"success": "✔️model server 연결 성공"})
         await websocket.send_json(response.json())
       # 사용자를 찾을 수 없다면 웹소켓 close
       else:

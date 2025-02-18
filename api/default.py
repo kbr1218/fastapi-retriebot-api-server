@@ -7,7 +7,6 @@ from setup import load_template_from_yaml
 from config import GEMINI_API_KEY
 
 # default_chain (사용자의 의미없는 입력값에 대해 정해진 답변을 할 때)
-# StructuredOutputParser 사용하여 체인의 출력값 구조를 고정
 response_schemas = [
   ResponseSchema(name="answer",
                  type="string",
